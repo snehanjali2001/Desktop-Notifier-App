@@ -1,0 +1,412 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.TrayIcon.MessageType;
+
+class Info {
+    String name;
+    String phonenumber;
+    String trip;
+    String aadhar;
+    String type;
+    boolean[] arr = new boolean[5];// This is the array which stores the result of the validation
+
+    // This method return the integer for the validation based onto the array of
+    // result of validation
+    public int validate(String s1, String s2, String s3, String s4, String s5) {
+        validateName(s1);
+        validatePh(s2);
+        validateTrip(s3);
+        validateAadhar(s4);
+        validateType(s5);
+
+        if (arr[0] == false) {
+            return 1;
+        }
+        if (arr[1] == false) {
+            return 2;
+        }
+        if (arr[2] == false) {
+            return 3;
+        }
+        if (arr[3] == false) {
+            return 4;
+        }
+        if (arr[4] == false) {
+            return 5;
+        } else {
+            return 6;
+        }
+    }
+
+    // Validate the name & assign the result of validation to the array.
+    void validateName(String s) {
+        int nS = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == ' ') {
+                nS++;
+            }
+            if (Character.isLetter(s.charAt(i)) || s.charAt(i) == ' ') {
+                continue;
+            } else {
+                arr[0] = false;
+                break;
+            }
+        }
+        if (nS == 2) {
+            arr[0] = true;
+        } else {
+            arr[0] = false;
+        }
+    }
+
+    // Validate the phone numnber & assign the result of validation to the array.
+    void validatePh(String s) {
+        if (s.matches("[0-9]+") && s.length() == 10) {
+            arr[1] = true;
+        } else {
+            arr[1] = false;
+        }
+    }
+
+    // Validate the entered trip & assign the result of validation to the array.
+    void validateTrip(String s) {
+        if (s.equalsIgnoreCase("Kerla") || s.equalsIgnoreCase("Kanykumari") || s.equalsIgnoreCase("Aagra")) {
+            arr[2] = true;
+        } else if (s.equalsIgnoreCase("Jammu & Kashmir") || s.equalsIgnoreCase("Jammu And Kashmir")
+                || s.equalsIgnoreCase("Jaypur")) {
+            arr[2] = true;
+        } else if (s.equalsIgnoreCase("Amrutasar")) {
+            arr[2] = true;
+        } else {
+            arr[2] = false;
+        }
+    }
+
+    // Validate the aadhar number & assign the result of validation to the array.
+    void validateAadhar(String s) {
+        if (s.matches("[0-9]+") && s.length() == 12) {
+            arr[3] = true;
+        } else {
+            arr[3] = false;
+        }
+    }
+
+    // Validate the type of the trip & assign the result of validation to the array.
+    void validateType(String s) {
+        if (s.equalsIgnoreCase("Family") || s.equalsIgnoreCase("Business")) {
+            arr[4] = true;
+        } else {
+            arr[4] = false;
+        }
+    }
+}
+
+class BookTrip extends Frame {// This is the class to create & manage viewtrip frame.
+    JFrame book = new JFrame("Book the Trip");
+    SystemTray t = SystemTray.getSystemTray();
+    Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
+    TrayIcon trayIcon = new TrayIcon(image, "v & M Tours ");
+
+    public BookTrip() {// Constructor
+
+        // Creating a frame
+        Container c2 = book.getContentPane();
+        c2.setLayout(null);
+        book.setBounds(0, 0, 1650, 1080);
+        book.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Creating a labels & TextFields to take the inputs.
+        JLabel l1 = new JLabel("Enter the full name of the person:-");
+        l1.setBounds(520, 50, 250, 100);
+        book.add(l1);
+        JTextField t1 = new JTextField();
+        t1.setBounds(780, 90, 300, 30);
+        book.add(t1);
+
+        JLabel l2 = new JLabel("Enter the phone number of the person:-");
+        l2.setBounds(520, 120, 250, 100);
+        book.add(l2);
+        JTextField t2 = new JTextField();
+        t2.setBounds(780, 160, 300, 30);
+        book.add(t2);
+
+        JLabel l3 = new JLabel("Enter the Trip that you want to take:-");
+        l3.setBounds(520, 190, 250, 100);
+        book.add(l3);
+        JTextField t3 = new JTextField();
+        t3.setBounds(780, 230, 300, 30);
+        book.add(t3);
+
+        JLabel l4 = new JLabel("Enter the aadhar card number without space:-");
+        l4.setBounds(520, 260, 260, 100);
+        book.add(l4);
+        JTextField t4 = new JTextField();
+        t4.setBounds(780, 300, 300, 30);
+        book.add(t4);
+
+        JLabel l5 = new JLabel("Enter type of trip(family,business):-");
+        l5.setBounds(520, 330, 250, 100);
+        book.add(l5);
+        JTextField t5 = new JTextField();
+        t5.setBounds(780, 370, 300, 30);
+        book.add(t5);
+
+        // Creating a sumbit button & And adding the actionlistener for it
+        JButton s = new JButton("Sumbit");
+        s.setBounds(520, 450, 100, 30);
+        book.add(s);
+        s.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Getting the input from he all TextFields.
+                int a = 0;
+                String s1 = t1.getText();
+                String s2 = t2.getText();
+                String s3 = t3.getText();
+                String s4 = t4.getText();
+                String s5 = t5.getText();
+
+                // Object for the vaildation
+                Info i = new Info();
+                a = i.validate(s1, s2, s3, s4, s5);// This will assign the value for the a based onto the validation
+                if (0 < a && a <= 6) {
+                    if (SystemTray.isSupported()) {
+                        try {
+                            displayTray(a);
+
+                        } catch (Exception ex) {
+
+                        }
+                    } else {
+                        System.out.println("System Tray is not supported\n");
+                    }
+                }
+
+            }
+
+        });
+
+        // Creating button to re enter the data after wrong inputs.And adding the action
+        // listener to it.
+        JButton r = new JButton("ReEnter Data");
+        r.setBounds(670, 450, 200, 30);
+        book.add(r);
+        r.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                t.remove(trayIcon);//Before exiting the frame remove trayicon
+                BookTrip newBook = new BookTrip();
+                book.dispose();
+                newBook.visible();
+
+            }
+        });
+
+        // Creating a view trip button & And adding the actionlistener for it
+        JButton v = new JButton("View Trip");
+        v.setBounds(920, 450, 140, 30);
+        book.add(v);
+        v.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                t.remove(trayIcon);//Before exiting the frame remove trayicon
+                ViewTrip trips = new ViewTrip();
+                book.dispose();
+                trips.visible();
+
+            }
+        });
+
+    }
+
+    // This method is to make frame visible.
+    public void visible() {
+        book.setVisible(true);
+    }
+
+    // Create the notification based onto the validation
+    public void displayTray(int i) throws Exception {
+        trayIcon.setImageAutoSize(true);
+        t.add(trayIcon);
+        if (i == 6) {// If all data is correct
+            trayIcon.displayMessage("Yeah", "Trip is booked successfully", MessageType.INFO);
+        } else if (i == 5) {// If type of trip input is wrong.
+            trayIcon.displayMessage("OOPS!!!!", "Enter the correct type of trip", MessageType.ERROR);
+        } else if (i == 4) {//// If aadhar number input is wrong.
+            trayIcon.displayMessage("OOPS!!!!!", "Enter the correct addhar number without spaces", MessageType.ERROR);
+        } else if (i == 3) {// If trip input is wrong.
+            trayIcon.displayMessage("OOPS!!!!!", "Enter the available trips only", MessageType.ERROR);
+        } else if (i == 2) {// If phone number input is wrong.
+            trayIcon.displayMessage("OOPS!!!!!", "Enter the correct phone number", MessageType.ERROR);
+        } else if (i == 1) {// If name input is wrong.
+            trayIcon.displayMessage("OOOPS!!!!", "Enter the correct name please", MessageType.ERROR);
+        }
+
+    }
+}
+
+// This is the class to create & manage viewtrip frame.
+class ViewTrip extends Frame {
+    JFrame view = new JFrame("Trips");
+
+    public ViewTrip() {// Constructor
+
+        Container c3 = view.getContentPane();
+        c3.setLayout(null);
+        view.setBounds(0, 0, 1650, 1080);
+        view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Adding the labels for a each trip.
+        JLabel head = new JLabel("Tours");
+        head.setBounds(700, 0, 300, 150);
+        view.add(head);
+
+        ImageIcon t1 = new ImageIcon("p4.jpg");
+        String s1 = "Kerla Trip \n5 Days Pacakge with hotel Bill\n  RS.9000 per person";
+        JLabel l1 = new JLabel(s1, t1, 4);
+        l1.setBounds(0, 60, 800, 300);
+        view.add(l1);
+
+        ImageIcon t2 = new ImageIcon("p5.jpg");
+        String s2 = "Kanykumari Trip \n3 Days Pacakge with hotel Bill\n  RS.6000 per person";
+        JLabel l2 = new JLabel(s2, t2, 4);
+        l2.setBounds(50, 300, 800, 300);
+        view.add(l2);
+
+        ImageIcon t3 = new ImageIcon("p6.jpg");
+        String s3 = "Aagra Trip \n2 Days Pacakge with hotel Bill\n  RS.3000 per person";
+        JLabel l3 = new JLabel(s3, t3, 4);
+        l3.setBounds(20, 580, 800, 200);
+        view.add(l3);
+
+        ImageIcon t4 = new ImageIcon("p7.jpg");
+        String s4 = "Jammu & KashmirTrip 5 Days Pacakge with hotel Bill RS.7000 per person";
+        JLabel l4 = new JLabel(s4, t4, 4);
+        l4.setBounds(720, 80, 800, 200);
+        view.add(l4);
+
+        ImageIcon t5 = new ImageIcon("p8.jpg");
+        String s5 = "Amrutasar 5 Days Pacakge with hotel Bill RS.5000 per person";
+        JLabel l5 = new JLabel(s5, t5, 4);
+        l5.setBounds(700, 320, 750, 200);
+        view.add(l5);
+
+        ImageIcon t6 = new ImageIcon("p9.jpg");
+        String s6 = "Jaypur 3 Days Pacakge with hotel Bill RS.2000 per person";
+        JLabel l6 = new JLabel(s6, t6, 4);
+        l6.setBounds(700, 570, 750, 200);
+        view.add(l6);
+
+        // Creating Back Button to go onto the main frame & adding action Listener for
+        // it.
+        JButton back = new JButton("Back");
+        back.setBounds(0, 0, 150, 50);
+        view.add(back);
+
+        // ActionListener for the Booking Trip Button.
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MainFrame m = new MainFrame();
+                view.dispose();
+                m.visible();
+            }
+        });
+
+    }
+
+    public void visible() {// To make visible.
+        view.setVisible(true);
+    }
+}
+
+// Class for creating main frame,making visisble,displayTray function.
+class MainFrame extends Frame {
+    JFrame f = new JFrame("V M Tours & Travels");
+    SystemTray t = SystemTray.getSystemTray();
+    Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
+    TrayIcon trayIcon = new TrayIcon(image, "v & M Tours ");
+
+    public MainFrame() {
+        // Creation of the main frame
+        Container c;
+
+        c = f.getContentPane();
+        c.setLayout(null);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setBounds(0, 0, 1650, 1080);
+
+        // Inserting the logo of the comapny
+        ImageIcon i = new ImageIcon("p3.png");
+        JLabel l = new JLabel(i);
+        l.setBounds(350, 10, 800, 650);
+        f.add(l);
+
+        // Adding the 2 buttons 1 to view the trips & 2nd one for the Booking the trips.
+        JButton b1 = new JButton("Book Trip");
+        JButton b2 = new JButton("View Trips");
+        b1.setBounds(350, 700, 300, 50);
+        b2.setBounds(850, 700, 300, 50);
+        f.add(b2);
+        f.add(b1);
+
+        // ActionListener for the Booking Trip Button.
+        b1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BookTrip b = new BookTrip();
+                f.dispose();
+                b.visible();
+            }
+        });
+
+        // ActionListener for the Viewing the trips.
+        b2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ViewTrip v = new ViewTrip();// Creating the frame for the viewing trips.
+                f.dispose();// Destroying the main frame.
+                v.visible();// Making a new frame visible.
+
+                // Following block checks wheteher the SystemTray is supported or not.If
+                // supported calls the display Tray message.
+                if (SystemTray.isSupported()) {
+                    try {
+                        displayTray();
+                        t.remove(trayIcon);
+                    } catch (Exception ex) {
+
+                    }
+                } else {
+                    System.out.println("System Tray is not supported\n");
+                }
+            }
+        });
+
+    }
+
+    public void visible() {
+        f.setVisible(true);
+    }
+
+    public void displayTray() throws Exception {// This method generates the System Tray & TrayIcon.Here TrayIcon
+                                                // displays the message.
+        trayIcon.setImageAutoSize(true);
+        t.add(trayIcon);
+        trayIcon.displayMessage("Welcome", "V & M TOURS & TRAVELS\n Just Pack n Move", MessageType.INFO);// Creates the
+                                                                                                         // pop up
+                                                                                                         // message
+        // Notification after clicking onto the view trip button.And display above
+        // messages.
+
+    }
+}
+
+public class Notifier {
+    public static void main(String[] args) {
+        MainFrame m = new MainFrame();
+        m.visible();
+
+    }
+}
